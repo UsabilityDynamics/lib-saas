@@ -16,7 +16,9 @@
     "lib/cloud.php"
   ],
   "files": [
-    "files/saas-schema.json"
+    "files/saas-schema.json",
+    "files/lib/cloud.php",
+    "files/lib/saas.php"
   ],
   "scripts": [
     "scripts/saas.js",
