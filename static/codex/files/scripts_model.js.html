@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>scripts/model.js - ud-lib-saas</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="http://a3d72a45d111006ec192-ec5b80a12b0b09b4d52373336afb4254.r80.cf1.rackcdn.com/usability-dynamics.png" title="ud-lib-saas"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: scripts/model.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * Knockout View Model
+ *
+ * Flexible View Model generator for interfaces:
+ * creates View Model object and initializes (apply bindings) knockout functionality.
+ * Contains basic view_model functionality such as add_data, remove_data ( the same as depriciated add and remove row functionality ), etc.
+ * Also, it&#x27;s used as Gateway to SaaS: initializes socket connection.
+ *
+ * @version 1.0
+ * @description ViewModel class for all knockout/saas instances ( view models )
+ * @package Knockout
+ * @subpackage UD
+ * @dependencies jquery, knockout, knockout-mapping, ud.socket, ud.saas
+ * @author team@UD
+ * @param args. mixed. Settings.
+ */
+if ( typeof ko !== &#x27;undefined&#x27; ) {
+
+  ko = jQuery.extend( true, {
+    &#x27;log&#x27;: ( typeof wpp !== &#x27;undefined&#x27; &amp;&amp; wpp.log === &#x27;function&#x27; ) ? wpp.log : function () {
+      return false;
+    },
+    &#x27;ajaxurl&#x27;: function ( action ) {
+      return typeof ajaxurl !== &#x27;undefined&#x27; ? ajaxurl + &#x27;?action=wpp_&#x27; + action : false;
+    },
+    &#x27;strings&#x27;: ( typeof wpp !== &#x27;undefined&#x27; &amp;&amp; wpp.strings !== &#x27;undefined&#x27; ) ? wpp.strings : {}
+  }, ko );
+
+  ko.view_model = function ( args ) {
+    &#x27;use strict&#x27;;
+    ko.log( &#x27;ko.view_model()&#x27;, arguments );
+
+    /* Try to determine if model&#x27;s name is set or model&#x27;s object already exists */
+    args = jQuery.extend( true, {
+      &#x27;model&#x27;: {}, // model can be string.
+      &#x27;args&#x27;: {}, // specific arguments for model getting. i.e. unique ID.
+      &#x27;instance&#x27;: {}, // Object which extends the current model. All additional object&#x27;s data can be set here
+      &#x27;bind&#x27;: true, // If true, it allows do ko.applyBindings()
+      &#x27;timeout&#x27;: 3000, //15000, // Interface load timeout.
+      &#x27;container&#x27;: false, // Required!
+      // All SaaS settings stored here
+      &#x27;saas&#x27;: {
+        &#x27;scope&#x27;: jQuery.extend( ( typeof wpp.saas === &#x27;object&#x27; ? wpp.saas : {} ), { scope: &#x27;wpp.saas&#x27; } ), // SaaS object scope ( ud.saas )
+        &#x27;model&#x27;: false,
+        &#x27;screen&#x27;: false,
+        &#x27;show_updates&#x27;: false, // Shows messages in navbar
+        &#x27;debug_mode&#x27;: false, // Prints logs to console
+        &#x27;force_new_connection&#x27;: false, // If true, we set new socket connection in any case.
+        &#x27;secure&#x27;: true, // SSL or not
+        &#x27;path&#x27;: &#x27;_saas&#x27;, // Link to object which should be emited on subscribe,
+        &#x27;instance&#x27;: typeof wpp._instance === &#x27;object&#x27; ? wpp._instance : {} // Contains client&#x27;s neccessary data such as site_url, api_key, etc
+      },
+      // Set of actions listeners which are fired on view model &#x27;triggers&#x27;
+      &#x27;actions&#x27;: {
+        &#x27;pre_apply&#x27;: function () {
+          return;
+        }, // Called before ko.applyBindings() function
+        &#x27;init&#x27;: function () {
+          return;
+        }, // Called after ko.applyBindings() function
+        &#x27;add_data&#x27;: function () {
+          return;
+        }, // Called after data adding
+        &#x27;remove_data&#x27;: function () {
+          return;
+        }, // Called after data removing
+        &#x27;get_model&#x27;: function () {
+          return;
+        }, // Called before we do ajax request for get model
+        &#x27;timeout&#x27;: false, // Called on timeout
+        &#x27;callback&#x27;: false, // Additional
+        &#x27;saas_connect&#x27;: function () {
+          return;
+        }, // Called on ud::saas::connect event
+        &#x27;saas_disconnect&#x27;: function () {
+          return;
+        }, // Called on ud::saas::disconnect event
+        &#x27;saas_set_screen&#x27;: function () {
+          return;
+        }, // Called on self.saas._set_screen
+        &#x27;saas_update_on&#x27;: function () {
+          return;
+        }, // Called on saas data updating by SaaS
+        &#x27;saas_update_emit&#x27;: function () {
+          return;
+        }, // Called on data emit to SaaS
+        &#x27;saas_ignored&#x27;: function () {
+          return;
+        } // Called if Saas connection is not established and we ignore it.
+      },
+      // Return / Callback handling. Outputs Error objects to console, returns second argument
+      // Should not be overwritten! If you want to add your callback use actions.callback
+      &#x27;callback&#x27;: function ( error, data ) {
+        var self = this;
+        if ( typeof self.actions === &#x27;object&#x27; &amp;&amp; typeof self.actions.callback === &#x27;function&#x27; ) {
+          return self.actions.callback( error, data );
+        } else {
+          if ( error instanceof Error ) {
+            ko.log( error, data );
+          }
+          return data;
+        }
+      }
+    }, typeof args === &#x27;object&#x27; ? args : ( typeof args === &#x27;string&#x27; ? { &#x27;model&#x27;: args } : {} ) );
+
+    /* Check container argument */
+    var container = ( args.container &amp;&amp; typeof args.container !== &#x27;object&#x27; ) ? jQuery( args.container ) : args.container;
+
+    if ( !container || typeof container.length === &#x27;undefined&#x27; || !container.length &gt; 0 ) {
+      return args.callback( new Error( &#x27;ko.view_model. Container is missing, or incorrect.&#x27; ), false );
+    }
+
+    /* Set Timeout Event */
+    if ( !args.actions.timeout || typeof args.actions.timeout !== &#x27;function&#x27; ) {
+      args.actions.timeout = function ( self ) {
+        /**
+         * Determine if Saas connection is not established.
+         * If yes, - so it can be the reason of timeout.
+         * Try to ignore Saas connection in this case and apply bindings without Saas. peshkov@UD
+         */
+        if ( typeof self.saas.model == &#x27;string&#x27; &amp;&amp; self.saas.connected == false &amp;&amp; self.saas.ignore == false ) {
+          try {
+            if ( typeof self.saas.scope == &#x27;object&#x27; ) self.saas.scope.disconnect();
+          } catch ( e ) {
+            console.log( e );
+          }
+          ;
+          /* Set bind val passed to view_model */
+          self._bind = self._args.bind;
+          /* Saas initialization is ignored now. */
+          self.saas.ignore = true;
+          /* We should set saas variable to observable in any case. */
+          if ( typeof self[ self.saas.path ] === &#x27;object&#x27; ) {
+            self[ self.saas.path ] = ko.mapping.fromJS( self[ self.saas.path ] );
+          }
+          /* Now, we try to call apply. */
+          self.apply();
+          /* Updates navbar notice */
+          if ( self.saas.show_updates ) {
+            self.navbar_notice( &#x27;SaaS offline&#x27; );
+          }
+          /* Special Handlers can be added here */
+          try {
+            self._args.actions.saas_ignored( self );
+          } catch ( e ) {
+            self._args.callback( e, self );
+          }
+          return;
+        }
+
+        self._is_timeout = true;
+        return args.callback( new Error( &#x27;Timeout. View Model load error.&#x27; ) );
+      };
+    }
+
+    var html = container.html();
+
+    container.html( &#x27;&#x27; ).addClass( &#x27;ud_view_model ud_ui_loading&#x27; ).append( &#x27;&lt;div class=&quot;ud_ui_spinner&quot;&gt;&lt;/div&gt;&#x27; ).append( &#x27;&lt;div class=&quot;ud_ui_prepared_interface&quot;&gt;&lt;/div&gt;&#x27; ).find( &#x27;.ud_ui_prepared_interface&#x27; ).html( html );
+
+    /**
+     * Creates View_Model
+     *
+     * Any view_model methods or static variables shoud be added inside of this function.
+     */
+    var vm = function ( args, container ) {
+
+      var self = this;
+
+      /* Determines if view_model already applied Bindings ( ko.applyBinding )  */
+      self._applied = false;
+
+      /* Determines if model&#x27;s data is successfully loaded */
+      self._loaded = false;
+
+      /* SaaS connection */
+      self.saas = args.saas;
+
+      /* Arguments */
+      self._args = args;
+
+      /* DOM */
+      self.container = container;
+
+      /* Action Hooks */
+      self._actions = {};
+
+      /* Bind. boolean */
+      self._bind = args.bind;
+
+      /* Is timeout? */
+      self._is_timeout = false;
+
+      /* setTimeout instances */
+      self.timers = {
+        &#x27;load_timeout&#x27;: false,
+        &#x27;socket_status&#x27;: false
+      };
+
+      /**
+       * Pushes new element to array.
+       *
+       * Example of usage:
+       * data-bind=&quot;click: $root.add_data.bind( $data, $root.some_array, $root.vhandler )&quot;
+       * where $root.vhandler is a function, which creates data.
+       *
+       * $root.vhandler example:
+       * self.handler = function() {
+       *   var self = this;
+       *   self.arg1 = ko.observable( &#x27;value1&#x27; );
+       *   self.arg2 = &#x27;value2&#x27;;
+       * }
+       *
+       * @param observableArray item. Where we want to add new data
+       * @param mixed vhandler. Name of function or function which inits new data
+       * @param object view_model. The current view_model object
+       * @param object event.
+       * @author peshkov@UD
+       */
+      self.add_data = function ( item, vhanlder, view_model, event ) {
+        if ( typeof vhanlder == &#x27;function&#x27; ) {
+          item.push( new vhanlder );
+        } else if ( typeof view_model[ vhanlder ] === &#x27;function&#x27; ) {
+          item.push( new view_model[ vhanlder ]() );
+        }
+        try {
+          self._args.actions.add_data( self, event, item, vhanlder )
+        } catch ( e ) {
+          self._args.callback( e, view_model );
+        }
+      };
+
+      /**
+       * Removes data from array.
+       *
+       * Example of usage:
+       * data-bind=&quot;click: $root.remove_data.bind( $data, $root.some_array )&quot;
+       *
+       * @param observableArray item. Where we want to remove data
+       * @param mixed data. Data which should be removed from array.
+       * @param object event.
+       * @author peshkov@UD
+       */
+      self.remove_data = function ( item, data, event ) {
+        var c = typeof ko.strings !== &#x27;undefined&#x27; &amp;&amp; typeof ko.strings.remove_confirmation !== &#x27;undefined&#x27; ? ko.strings.remove_confirmation : &#x27;Are you sure you want to remove it?&#x27;;
+        if ( confirm( c ) ) {
+          item.remove( data );
+        }
+        try {
+          self._args.actions.remove_data( self, event, item, data )
+        } catch ( e ) {
+          self._args.callback( e, self );
+        }
+      };
+
+      /**
+       * Checks item in array
+       * Template Helper Function
+       *
+       * @author potanin@UD
+       */
+      self.in_array = function ( item, data ) {
+        // console.info( &#x27;ko.view_model._show()&#x27;, arguments );
+        return ( data instanceof Array &amp;&amp; data.indexOf( item ) != -1 );
+      };
+
+      /**
+       * Renders Message in Navbar sent by SaaS.
+       *
+       * @author potanin@UD
+       */
+      self.navbar_notice = function ( data ) {
+        var self = this;
+        /* */
+        data = ( typeof data === &#x27;string&#x27; ? { message: data } : ( typeof data === &#x27;object&#x27; ? data : {} ) );
+        /* If message property is not defined at all, we do not proceed */
+        if ( typeof data.message === &#x27;undefined&#x27; ) return;
+
+        var socket_status = jQuery( &#x27;li#ud_saas_message&#x27; ), socket_object = jQuery( &#x27;li#ud_saas_object&#x27; );
+
+        /* Add Navbar Status Container */
+        if ( !socket_status.length &gt; 0 ) {
+          jQuery( &#x27;ul#wp-admin-bar-root-default.ab-top-menu&#x27; ).append( socket_status = jQuery( &#x27;&lt;li id=&quot;ud_saas_message&quot; class=&quot;ud_saas_message&quot;&gt;&lt;/li&gt;&#x27; ) );
+        }
+
+        if ( data.object ) {
+          if ( !socket_object.length &gt; 0 ) {
+            jQuery( &#x27;ul#wp-admin-bar-root-default.ab-top-menu&#x27; ).append( socket_object = jQuery( &#x27;&lt;li id=&quot;ud_saas_object&quot; class=&quot;ud_saas_object&quot;&gt;[object]&lt;/li&gt;&#x27; ) );
+          }
+          ;
+          jQuery( socket_object ).unbind( &#x27;click&#x27; );
+          jQuery( socket_object ).bind( &#x27;click&#x27;, function () {
+            ud.admin.pointer( socket_object, {
+              &#x27;pointerClass&#x27;: &#x27;wp-pointer ud-pointer ud-saas-debug&#x27;,
+              &#x27;title&#x27;: data.message,
+              &#x27;pointerWidth&#x27;: 600,
+              &#x27;content&#x27;: &#x27;&lt;pre&gt;&#x27; + JSON.stringify( data.object, undefined, 2 ) + &#x27;&lt;/pre&gt;&#x27;
+            } );
+          } );
+        }
+
+        socket_status.fadeTo( 500, 1, function () {
+          window.clearTimeout( self.timers.socket_status );
+          socket_status.html( data.message ? data.message : &#x27;&#x27; );
+          self.timers.socket_status = window.setTimeout( function () {
+            socket_status.fadeTo( 3000, 0.5, function () {
+              window.setTimeout( function () {
+                socket_status.fadeTo( 3000, 0.1 );
+              }, 5000 );
+            } );
+          }, data.fade_out ? data.fade_out : 10000 );
+        } );
+
+        return data.message;
+      };
+
+      /**
+       * Wrapper for ko.applyBindings()
+       *
+       * Calls before ko.applyBindings() - self.pre_apply()
+       * Calls after ko.applyBindings()  - init()
+       *
+       * @author peshkov@UD
+       */
+      self.apply = function () {
+        // console.info( &#x27;ko.view_model.vm().apply()&#x27; );
+
+        var self = this;
+
+        if ( self._is_timeout ) {
+
+          // console.info( &#x27;ko.view_model.vm().apply() - Timeout.&#x27; );
+          return false;
+
+        } else if ( !self._bind ) {
+
+          // console.info( &#x27;ko.view_model.vm().apply() - Halted.&#x27; );
+          return self._args.callback( null, self );
+
+        } else if ( this._applied ) {
+
+          // console.info( &#x27;ko.view_model.vm().apply() - Already applied.&#x27; );
+          return self._args.callback( null, self );
+
+        } else if ( !self._loaded ) {
+
+          // console.info( &#x27;ko.view_model.vm().apply() - Model was not loaded&#x27; );
+          var error = typeof ko.strings.ko_model_failed ? ko.strings.ko_model_failed : &#x27;Knockout Model was not loaded.&#x27;;
+          return self._args.callback( new Error( error ), self );
+
+        } else {
+
+          try {
+
+            /* Special Handlers can be added here */
+            try {
+              self._args.actions.pre_apply( self )
+            } catch ( e ) {
+              self._args.callback( e, self );
+            }
+
+            ko.applyBindings( self, self.container.get( 0 ) );
+
+            self._applied = true;
+
+            self.container.removeClass( &#x27;ud_ui_loading&#x27; ).addClass( &#x27;ud_ui_applied&#x27; );
+
+            /** Prevent Load Timeout Event */
+            clearTimeout( self.timers.load_timeout );
+
+            // console.info( &#x27;ko.view_model.vm().apply() - Applied.&#x27; );
+
+            /* Special Handlers can be added here */
+            try {
+              self._args.actions.init( self );
+            } catch ( e ) {
+              console.log( e );
+              self._args.callback( e, self );
+            }
+
+            return self._args.callback( null, self );
+
+          } catch ( error ) {
+
+            return self._args.callback( error, self );
+
+          }
+
+        }
+
+      }
+
+      /**
+       * Recursively parses model data and prepares it for MVVM view_model.
+       * Internal function which called automatically on view_model initialization.
+       * Should not be used manually!
+       *
+       * @author peshkov@UD
+       */
+      self._prepare_model_data = function ( r, d ) {
+        // console.info( &#x27;_prepare_model_data&#x27;, arguments );
+
+        var self = this;
+        var data = {};
+
+        r = typeof r !== &#x27;object&#x27; ? {} : r;
+        d = typeof d !== &#x27;object&#x27; ? self : d;
+
+        for ( var i in r ) {
+
+          switch ( i ) {
+
+            case &#x27;_static&#x27;:
+              // console.info( &#x27;_static&#x27;, r[i] );
+
+              for ( var e in r[i] ) {
+                /* Handler for incoming data. You need to add handler to &#x27;model&#x27; argument */
+                if ( d &amp;&amp; typeof d[e] === &#x27;function&#x27; ) {
+                  data[e] = d[e]( r[i][e] );
+                } else {
+                  data[e] = r[i][e];
+                }
+              }
+              break;
+
+            case &#x27;_observable&#x27;:
+              // console.info( &#x27;_observable&#x27;, r[i] );
+
+              for ( var e in r[i] ) {
+                /* Handler for incoming data. You need to add handler to &#x27;model&#x27; argument */
+                if ( d &amp;&amp; typeof d[e] === &#x27;function&#x27; ) {
+                  data[e] = d[e]( r[i][e] );
+                } else {
+                  if ( !r[i][e] || typeof r[i][e].length === &#x27;undefined&#x27; ) {
+                    data[e] = ko.observable( r[i][e] );
+                  } else {
+                    if ( typeof r[i][e] === &#x27;object&#x27; ) {
+
+                      data[e] = ko.observableArray( r[i][e] );
+
+                    } else {
+
+                      data[e] = ko.observable( r[i][e] );
+
+                    }
+                  }
+                }
+              }
+              break;
+
+          /**
+           * Contains additional interfaces added by hooks
+           *
+           * It&#x27;s used instead of do_action.
+           * You should add all additional data to the current interface by apply_filter,
+           * which has to be called in model.
+           *
+           * To add &#x27;some_action&#x27; hook to interface you should do the following steps:
+           * View:
+           * &lt;div data-action_hook=&quot;some_action&quot;&gt;&lt;/div&gt;
+           * Model:
+           * r._action = { some_hook: [ &#x27;&lt;div&gt;HEllo&lt;/div&gt;&#x27;, &#x27;&lt;span&gt;WoRlD!&lt;/span&gt;&#x27; ], some_other_hook: [ &#x27;&#x27; ], ... }
+           * Result:
+           * &lt;div data-action_hook=&quot;some_action&quot;&gt;&lt;div&gt;HEllo&lt;/div&gt;&lt;span&gt;WoRlD!&lt;/span&gt;&lt;/div&gt;
+           *
+           * @author peshkov@UD
+           */
+            case &#x27;_action&#x27;:
+              self._actions = jQuery.extend( true, self._actions, r[i] );
+              break;
+
+          /**
+           * SAAS interface
+           * Used by SaaS. All data for SaaS emit should be added here.
+           *
+           * @author peshkov@UD
+           */
+            case &#x27;_saas&#x27;:
+              if ( typeof self.saas.path == &#x27;string&#x27; ) {
+                data[ self.saas.path ] = {};
+                for ( var e in r[i] ) {
+                  switch ( e ) {
+                    case &#x27;conditionals&#x27;:
+                      data[ self.saas.path ] = jQuery.extend( true, {}, data[ self.saas.path ], r[i][e] );
+                      break;
+                    case &#x27;interface&#x27;:
+                    default:
+                      data[ self.saas.path ] = jQuery.extend( true, {}, r[i][e], data[ self.saas.path ] );
+                      break;
+                  }
+                }
+                /* Convert values screwed up by PHP/MySQL/whatever */
+                if ( typeof ud.utils === &#x27;object&#x27; &amp;&amp; typeof ud.utils.type_fix === &#x27;function&#x27; ) {
+                  data[ self.saas.path ] = ud.utils.type_fix( data[ self.saas.path ], { &#x27;nullify&#x27;: true } );
+                }
+                /* Interface Handler. */
+                if ( d &amp;&amp; typeof d[ self.saas.path ] === &#x27;function&#x27; ) {
+                  data[ self.saas.path ] = d[ self.saas.path ]( data[ self.saas.path ] );
+                }
+              }
+              break;
+
+          /**
+           * Any other data.
+           * Check it recursively.
+           */
+            default:
+              /* Handler for incoming data. You need to add handler to &#x27;model&#x27; argument */
+              if ( d &amp;&amp; typeof d[i] === &#x27;function&#x27; ) {
+                data[i] = d[i]( r[i] );
+              } else {
+                /**
+                 * Determine if we need to check data recursively or just set value.
+                 */
+                if ( typeof r[i] === &#x27;object&#x27; &amp;&amp; typeof r[i].length === &#x27;undefined&#x27; ) {
+                  data[i] = self._prepare_model_data( r[i], ( typeof d[i] === &#x27;object&#x27; ? d[i] : false ) );
+                } else {
+                  data[i] = r[i];
+                }
+              }
+              break;
+          }
+        }
+
+        return data;
+      }
+
+      /* Init callback on timeout */
+      self.timers.load_timeout = setTimeout( function () {
+        args.actions.timeout( self )
+      }, args.timeout );
+
+      /* All additional methods and elements for the current model can be added here */
+      self = jQuery.extend( true, self, ( typeof self._args.instance === &#x27;object&#x27; ? self._args.instance : {} ) );
+
+      /**
+       * Determine if we already have model or we need to get it from server.
+       */
+      if ( typeof self._args.model === &#x27;string&#x27; ) {
+        self._args.model_name = self._args.model;
+
+        /** Get model data from server */
+        jQuery.ajax( {
+          url: ko.ajaxurl( &#x27;get_model&#x27; ),
+          data: {
+            &#x27;args&#x27;: jQuery.extend( true, {}, { &#x27;model&#x27;: self._args.model_name }, self._args.args )
+          },
+          dataType: &#x27;json&#x27;,
+          type: &#x27;POST&#x27;,
+          async: false,
+          beforeSend: function ( xhr ) {
+            try {
+              self._args.actions.get_model( self )
+            } catch ( e ) {
+              self._args.callback( e, self );
+            }
+            xhr.overrideMimeType( &#x27;application/json; charset=utf-8&#x27; );
+          },
+          complete: function ( jqXHR ) {
+            var r = {};
+            try {
+              r = jQuery.parseJSON( jqXHR.responseText );
+              if ( typeof r !== &#x27;object&#x27; || jqXHR.responseText === &#x27;&#x27; ) {
+                throw new Error( &#x27;Ajax response is empty&#x27; );
+              } else if ( jqXHR.status === 500 ) {
+                throw new Error( &#x27;Internal Server Error&#x27; );
+              } else if ( jqXHR.statusText === &#x27;timeout&#x27; ) {
+                throw new Error( &#x27;Server Timeout&#x27; );
+              } else if ( typeof r.success == true ) {
+                throw new Error( &#x27;Could not get \&#x27;&#x27; + self._args.model + &#x27;\&#x27; model&#x27; );
+              }
+            } catch ( error ) {
+              ko.log( &#x27;AJAX Error: &#x27; + ( error.message ? error.message : &#x27;Unknown.&#x27; ) );
+              self._args.model = r = false;
+            }
+            if ( r ) {
+              self._args.model = r.model;
+              self._args.model._name = self._args.model_name;
+            }
+          },
+          error: function ( jqXHR, textStatus, errorThrown ) {
+          }
+        } );
+      } else {
+        if ( typeof self._args.model._name === &#x27;undefined&#x27; ) {
+          self._args.model._name = &#x27;&#x27;;
+        }
+      }
+
+      /** Determine if global model is _loaded. If not, we stop process. */
+      if ( !self._args.model ) {
+        return;
+      } else {
+        self._loaded = true;
+      }
+
+      /* Prepare data for MVVM view_model by parsing model&#x27;s object */
+      var prepared_data = self._prepare_model_data( self._args.model );
+
+      /* Merge model Localization data with global Localization strings */
+      prepared_data.strings = jQuery.extend( true, ko.strings, ( typeof prepared_data.strings != &#x27;undefined&#x27; ) ? prepared_data.strings : {} );
+
+      /* Merge default and prepared data */
+      self = jQuery.extend( true, self, prepared_data );
+
+      /**
+       * Go through all hooks and add interfaces if exist.
+       * See: case _action in self._prepare_model_data()
+       */
+      for ( var i in self._actions ) {
+        if ( jQuery( &#x27;[data-action_hook=&quot;&#x27; + i + &#x27;&quot;]&#x27;, container ).length &gt; 0 ) {
+          for ( var a in self._actions[i] ) {
+            if ( typeof self._actions[i][a] === &#x27;string&#x27; ) {
+              jQuery( &#x27;[data-action_hook=&quot;&#x27; + i + &#x27;&quot;]&#x27;, container ).append( self._actions[i][a] );
+            } else {
+              // Ignore it for now.
+            }
+          }
+        }
+      }
+
+      /** SAAS LOGIC STARTS HERE NOW */
+
+      /**
+       * Ran after SaaS has trigger Screen Set Event, meaning it is ready
+       *
+       * @author potanin@UD
+       */
+      self.saas._set_screen = function ( e, args ) {
+        ko.log( &#x27;ko.view_model.vm()._saas_screen_set()&#x27;, arguments );
+
+        /**
+         * If ignore is true we stop SaaS initialization.
+         * It happens, if timeout is called and Saas is still not established.
+         */
+        if ( self.saas.ignore ) {
+          return;
+        }
+
+        self.saas.connected = true;
+
+        /**
+         * Determine if view_model has saas data before add listeners
+         */
+        if ( typeof self[ self.saas.path ] === &#x27;object&#x27; ) {
+          /* Set _active flag to true. So it says that saas is ready */
+          self.saas._active( true );
+          /* Set update trigger as we already know session ID */
+          self.saas.update_trigger = self.saas.id + &#x27;::update::&#x27; + self.saas.screen;
+
+          /**
+           * Wait for Interface Request
+           */
+          self.saas.scope.on( self.saas.id + &#x27;::request::_interface&#x27;, function () {
+            ko.log( &#x27;ko.view_model.vm()._saas_screen_set(); Interface request received, responding.&#x27; );
+            self.saas._merging( true );
+            self.saas.scope.emit( self.saas.id + &#x27;::update::&#x27; + self.saas.screen, {
+              &#x27;key&#x27;: self.saas.path,
+              &#x27;value&#x27;: ko.toJS( self[ self.saas.path ] )
+            } );
+            self.saas._merging( false );
+          } );
+
+          /**
+           * Monitor Update Triggers, and set values
+           */
+          self.saas.scope.on( self.saas.update_trigger, function ( data ) {
+            // console.info( &#x27;_prepare_interface() -&gt; &#x27; + self.saas.update_trigger + &#x27; (&#x27; + update.path + &#x27;.&#x27; + update.key + &#x27;)&#x27;, arguments );
+
+            var data = jQuery.extend( {
+              &#x27;path&#x27;: false,
+              &#x27;key&#x27;: false,
+              &#x27;value&#x27;: false,
+              &#x27;update&#x27;: true,
+              &#x27;message&#x27;: false
+            }, data );
+
+            var full_path = ( data.path &amp;&amp; data.key ? ( data.path + &#x27;.&#x27; + data.key ) : false );
+
+            /* Disable subscribe event */
+            self.saas._merging( true );
+
+            /* Update value */
+            if ( data.update &amp;&amp; full_path !== false ) {
+              try {
+                self.saas._observable_caller[ full_path ][ &#x27;value&#x27; ]( data.value );
+              } catch ( e ) {
+                self._args.callback( new Error( &#x27;Interface Path Not Found&#x27; ), self );
+              }
+            }
+
+            /* Updates navbar notice if message exists */
+            if ( typeof data.message === &#x27;string&#x27; &amp;&amp; data.message.length &gt; 0 &amp;&amp; self.saas.show_updates ) {
+              self.navbar_notice( data.message );
+            }
+
+            /* Special Handlers can be added here */
+            try {
+              self._args.actions.saas_update_on( self, data )
+            } catch ( e ) {
+              self._args.callback( e, self );
+            }
+
+            /* Enable subscribe event */
+            self.saas._merging( false );
+          } );
+
+          jQuery( document ).bind( self.saas.id + &#x27;::disconnected&#x27;, function ( event, data ) {
+            self.saas._active( false );
+          } );
+
+          self[ self.saas.path ] = self.saas._set_emit( self[ self.saas.path ] );
+        }
+
+        /** Call SaaS callback if needed when data is set and prepared */
+        try {
+          self._args.actions.saas_set_screen( self )
+        } catch ( e ) {
+          self._args.callback( e, self );
+        }
+
+        /* Set bind val passed to view_model */
+        self._bind = self._args.bind;
+
+        /* Now, when SaaS is ready we try to call apply again */
+        self.apply();
+      };
+
+      /**
+       * Observable data, pares and add Subscribers to all observable items that emit updates
+       *
+       * @param data
+       * @param path
+       * @author potanin@UD
+       */
+      self.saas._set_emit = function ( data, path ) {
+        // console.info( &#x27;_prepare_interface()&#x27;, arguments );
+
+        /* Add emit on subscribe event */
+        var subscribe = function ( object, key, path ) {
+          self.saas._observable_caller[ path + &#x27;.&#x27; + key ] = { &#x27;path&#x27;: path, &#x27;key&#x27;: key, &#x27;value&#x27;: object };
+          object.subscribe( function ( value ) {
+            if ( !self.saas._merging() ) {
+              try {
+                var data = { &#x27;key&#x27;: key, &#x27;value&#x27;: value, &#x27;path&#x27;: path };
+                /* Special Handlers can be added here */
+                self._args.actions.saas_update_emit( self, data );
+                self.saas.scope.emit( self.saas.update_trigger, data );
+              } catch ( e ) {
+                self._args.callback( e, self );
+              }
+            }
+          }, self );
+        };
+
+        /* Recursively check data and set subscribe events */
+        var subscribe_deep = function ( object, path ) {
+          for ( var key in object ) {
+            /* Ignore extra data */
+            if ( key === &#x27;__ko_mapping__&#x27; ) {
+              continue;
+              /* Determine if element is observable */
+            } else if ( ko.isObservable( object[key] ) ) {
+              subscribe( object[key], key, path );
+              /* Recursively check and subscribe object&#x27;s data */
+            } else if ( typeof object[key] === &#x27;object&#x27; ) {
+              subscribe_deep( object[key], path + &#x27;.&#x27; + key );
+            }
+          }
+        }
+
+        data = ko.mapping.fromJS( data );
+
+        subscribe_deep( data, typeof path === &#x27;string&#x27; ? path : self.saas.path );
+
+        return data;
+      };
+
+      /* Determine if still have saas data as function and fix it */
+      if ( typeof self[ self.saas.path ] === &#x27;function&#x27; ) {
+        self[ self.saas.path ] = self[ self.saas.path ]( {} );
+      }
+
+      /**
+       * Now we try to connect to SaaS ( if saas.model is set )
+       * If SaaS Screen is specified, we wait for screen to be ready, and then load Interface, if needed
+       */
+      if ( typeof self.saas.model === &#x27;string&#x27; ) {
+        // console.info( &#x27;ko.view_model() - Binding SaaS MVVM Handlers&#x27; );
+
+        /** Return Error if SaaS scope object is incorrect some reason */
+        if ( typeof self.saas.scope.connect !== &#x27;function&#x27; ) {
+          self._bind = false;
+          return self._args.callback( new Error( typeof ko.strings.saas_connection_fail !== &#x27;undefined&#x27; ? ko.strings.saas_connection_fail : &#x27;Application could not connect to SaaS.&#x27; ), self );
+        }
+
+        /* Enable/Disable Navbar SaaS Status and console Updates */
+        self.saas.scope.show_updates = self.saas.show_updates;
+        if ( typeof self.saas.scope.settings.log !== &#x27;undefined&#x27; ) {
+          if ( self.saas.debug_mode ) jQuery.extend( self.saas.scope.settings.log, { &#x27;events&#x27;: true, &#x27;all_data&#x27;: true } ); else jQuery.extend( self.saas.scope.settings.log, { &#x27;events&#x27;: false, &#x27;all_data&#x27;: false } );
+        }
+
+        /* Update|Fix SaaS instance */
+        self.saas.scope.instance = jQuery.extend( {
+          &#x27;api_key&#x27;: false,
+          &#x27;site_uid&#x27;: false,
+          &#x27;customer_key&#x27;: false,
+          &#x27;customer_name&#x27;: false,
+          &#x27;site_url&#x27;: false,
+          &#x27;home&#x27;: false,
+          &#x27;ajax&#x27;: false,
+          &#x27;ip&#x27;: false,
+          &#x27;site&#x27;: false,
+          &#x27;screen&#x27;: false
+        }, self.saas.scope.instance, typeof self.saas.instance === &#x27;object&#x27; ? self.saas.instance : {} );
+
+        /* Set additional specific SaaS data */
+        jQuery.extend( self.saas, {
+          // Socket Session ID
+          &#x27;id&#x27;: false,
+          // Name of event which called on self[ self.saas.path ] element subscribe
+          &#x27;update_trigger&#x27;: false,
+          // Used as a flag to disable subscribe while updating
+          &#x27;_merging&#x27;: ko.observable( false ),
+          // Screen not set until SaaS says it is set
+          &#x27;_active&#x27;: ko.observable( null ),
+          // The list of interface elements which should do saas.emit on subscribe
+          &#x27;_observable_caller&#x27;: {},
+          // Check if we connected to SaaS
+          &#x27;connected&#x27;: false,
+          //
+          &#x27;ignore&#x27;: false
+        } );
+
+        if ( typeof self.saas.screen === &#x27;string&#x27; ) {
+
+          /* We should do SaaS connection before bindings will be applied. */
+          self._bind = false;
+
+          /* Call self._saas_screen_set when socket is connected. */
+          if ( self.saas.scope.id &amp;&amp; !self.saas.force_new_connection ) {
+            /* Looks like connection is already established, so just add bind */
+            self.saas.id = self.saas.scope.id;
+            jQuery( document ).one( self.saas.scope.id + &#x27;::update::screen_set::&#x27; + self.saas.screen, self.saas._set_screen );
+          } else {
+            /* Connection is not established yet ( or we force new connection ),
+             * so we add event to ud::saas::connect, because we need to know connection ID. */
+            jQuery( document ).one( &#x27;ud::saas::connect&#x27;, function ( event, socket ) {
+              self.saas.id = socket.id;
+              /* */
+              jQuery( document ).one( socket.id + &#x27;::update::screen_set::&#x27; + self.saas.screen, self.saas._set_screen );
+              /* */
+              try {
+                self._args.actions.saas_connect( self )
+              } catch ( e ) {
+                self._args.callback( e, self );
+              }
+              /* Prints all updates in navbar */
+              jQuery( document ).bind( socket.id + &#x27;::update&#x27;, function ( event, data ) {
+                if ( self.saas.show_updates ) {
+                  self.navbar_notice( data );
+                }
+              } );
+              /* Prints &#x27;SaaS Online&#x27; on SaaS ready */
+              jQuery( document ).one( socket.id + &#x27;::init&#x27;, function ( event, socket ) {
+                if ( self.saas.show_updates ) {
+                  self.navbar_notice( { &#x27;message&#x27;: ko.strings.connection_established ? ko.strings.connection_established : &#x27;SaaS Online.&#x27; } );
+                }
+              } );
+              /* Call saas_disconnect action and print &#x27;SaaS Offline&#x27; on connection lost */
+              jQuery( document ).one( socket.id + &#x27;::disconnected&#x27;, function ( event, socket ) {
+                if ( self.saas.show_updates ) {
+                  self.navbar_notice( { &#x27;message&#x27;: ko.strings.connection_lost ? ko.strings.connection_lost : &#x27;SaaS Offline.&#x27; } );
+                }
+                /* Do additional actions ( callback ) on disconnect */
+                try {
+                  self._args.actions.saas_disconnect( self )
+                } catch ( e ) {
+                  self._args.callback( e, self );
+                }
+              } );
+            } );
+          }
+
+          /* Switch active screen ( SaaS instance screen ) */
+          self.saas.scope.instance.screen = self.saas.screen;
+
+        }
+
+        /* Do connection to socket */
+        self.saas.scope.connect( self.saas.model, { &#x27;force new connection&#x27;: self.saas.force_new_connection, &#x27;secure&#x27;: self.saas.secure } );
+
+      } else {
+
+        /* We should set saas variable to observable in any case. */
+        if ( typeof self[ self.saas.path ] === &#x27;object&#x27; ) {
+          self[ self.saas.path ] = ko.mapping.fromJS( self[ self.saas.path ] );
+        }
+
+      }
+
+    }
+
+    /* Bind Knockout */
+    vm = new vm( args, container );
+
+    ko.log( vm );
+
+    return vm.apply();
+
+  }
+
+} else {
+  ko = { view_model: function () {
+    return false;
+  } }
+}
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

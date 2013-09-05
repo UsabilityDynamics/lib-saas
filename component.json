@@ -19,7 +19,9 @@
     "files/saas-schema.json"
   ],
   "scripts": [
-    "scripts/saas.js"
+    "scripts/saas.js",
+    "scripts/model.js",
+    "scripts/socket.js"
   ],
   "authors": [
     {
