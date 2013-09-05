@@ -1,27 +1,25 @@
 {
-  "name": "{{name}}",
+  "name": "ud-lib-saas",
   "version": "0.0.1",
-  "description": "{{description}}",
-  "homepage": "http://github.com/UsabilityDynamics/{{name}}",
+  "description": "ud-lib-saas",
+  "homepage": "http://github.com/UsabilityDynamics/ud-lib-saas",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/UsabilityDynamics/{{name}}"
+    "url": "https://github.com/UsabilityDynamics/ud-lib-saas"
   },
   "dependencies": {
     "usabilitydynamics/ud-lib-utility": "*"
   },  
   "lib": [
-    "lib/core.php"
+    "lib/saas.php",
+    "lib/cloud.php"
   ],
   "files": [
-    "files/schema.json"
-  ],
-  "styles": [
-    "styles/index.css"
+    "files/saas-schema.json"
   ],
   "scripts": [
-    "scripts/index.js"
+    "scripts/saas.js"
   ],
   "authors": [
     {
