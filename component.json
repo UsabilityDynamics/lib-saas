@@ -10,17 +10,13 @@
   },
   "dependencies": {
     "usabilitydynamics/ud-lib-utility": "*"
-  },  
-  "lib": [
-    "lib/saas.php",
-    "lib/cloud.php"
-  ],
+  },
   "files": [
-    "files/saas-schema.json",
-    "files/lib/cloud.php",
-    "files/lib/saas.php"
+    "files/saas-schema.json"
   ],
   "scripts": [
+    "scripts/cloud.php",
+    "scripts/saas.php",
     "scripts/saas.js",
     "scripts/model.js",
     "scripts/socket.js"
