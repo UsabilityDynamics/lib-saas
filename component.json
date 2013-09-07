@@ -1,15 +1,15 @@
 {
-  "name": "ud-lib-saas",
+  "name": "lib-saas",
   "version": "0.0.1",
-  "description": "ud-lib-saas",
-  "homepage": "http://github.com/UsabilityDynamics/ud-lib-saas",
+  "description": "lib-saas",
+  "homepage": "http://github.com/UsabilityDynamics/lib-saas",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/UsabilityDynamics/ud-lib-saas"
+    "url": "https://github.com/UsabilityDynamics/lib-saas"
   },
   "dependencies": {
-    "usabilitydynamics/ud-lib-utility": "*"
+    "usabilitydynamics/lib-utility": "*"
   },
   "files": [
     "files/saas-schema.json"
