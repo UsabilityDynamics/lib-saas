@@ -56,7 +56,7 @@
 
         $args = wp_parse_args( $args, array(
           'force_check' => false
-        ));
+        ) );
 
         $key = false;
 
@@ -439,6 +439,7 @@
        * Address Validation
        *
        * @param bool $update
+       *
        * @return bool
        */
       static public function available_address_validation( $update = false ) {
