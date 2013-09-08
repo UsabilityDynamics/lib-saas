@@ -16,9 +16,11 @@
     "files/schema/saas.document.json",
     "files/saas.config.json"
   ],
+  "libs": [
+    "libs/saas.php",
+    "libs/saas.document.php"
+  ],
   "scripts": [
-    "scripts/saas.php",
-    "scripts/saas.document.php",
     "scripts/saas.js",
     "scripts/saas.document.js",
     "scripts/model.js",
