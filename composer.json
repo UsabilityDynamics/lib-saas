@@ -16,7 +16,7 @@
     "UsabilityDynamics": "libs/",
     "files": [
       "libs/saas.php",
-      "libs/saas.document.php",
+      "libs/saas.document.php"
     ]
   },
   "homepage": "http://github.com/usabilitydynamics/lib-saas",
