@@ -13,10 +13,9 @@
     }
   ],
   "autoload": {
-    "UsabilityDynamics": "libs/",
     "files": [
-      "libs/saas.php",
-      "libs/saas.document.php"
+      "lib/saas.php",
+      "lib/saas.document.php"
     ]
   },
   "homepage": "http://github.com/usabilitydynamics/lib-saas",

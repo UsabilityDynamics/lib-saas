@@ -18,9 +18,9 @@
   "files": [
     "files/saas.config.json"
   ],
-  "libs": [
-    "libs/saas.php",
-    "libs/saas.document.php"
+  "lib": [
+    "lib/saas.php",
+    "lib/saas.document.php"
   ],
   "scripts": [
     "scripts/saas.js",
