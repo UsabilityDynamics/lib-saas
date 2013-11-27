@@ -16,7 +16,9 @@
   "autoload": {
     "files": [
       "lib/saas.php",
-      "lib/raas.php"
+      "lib/saas.document.php",
+      "lib/raas.php",
+      "lib/raas.job.php"
     ]
   },
   "homepage": "http://github.com/usabilitydynamics/lib-saas",
