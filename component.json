@@ -20,7 +20,9 @@
   ],
   "lib": [
     "lib/saas.php",
-    "lib/saas.document.php"
+    "lib/saas.document.php",
+    "lib/raas.php",
+    "lib/raas.job.php"
   ],
   "scripts": [
     "scripts/saas.js",
