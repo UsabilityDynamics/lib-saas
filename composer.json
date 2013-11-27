@@ -1,15 +1,16 @@
 {
   "name": "usabilitydynamics/lib-saas",
-  "keywords": [ "api" ],
+  "keywords": [ "api", "raas", "saas" ],
   "type": "library",
   "require": {
-    "usabilitydynamics/lib-utility": "*"
+    "usabilitydynamics/lib-utility": "*",
+    "usabilitydynamics/wp-xmlrpc": "*"
   },
   "minimum-stability": "dev",
   "repositories": [
     {
-      "type": "vcs",
-      "url": "https://github.com/UsabilityDynamics/lib-utility"
+      "type": "composer",
+      "url": "http://repository.usabilitydynamics.com"
     }
   ],
   "autoload": {
