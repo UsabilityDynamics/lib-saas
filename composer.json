@@ -14,7 +14,7 @@
     }
   ],
   "autoload": {
-    "files": [
+    "classmap": [
       "lib/saas.php",
       "lib/saas.document.php",
       "lib/raas.php",
