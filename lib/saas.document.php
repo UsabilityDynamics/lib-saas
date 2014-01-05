@@ -246,10 +246,10 @@ namespace UsabilityDynamics {
        * @since 1.0.0
        * @author potanin@UD
        */
-      static function log( $data ) {
+      static function log( $message = '', $args = false ) {
 
-        if( defined( 'WP_DEBUG' ) && WP_DEBUG && is_wp_error( $data ) ) {
-          wp_die( '<h1>Debug Log</h1><pre>' . print_r( $data, true ) . '</pre>' );
+        if( defined( 'WP_DEBUG' ) && WP_DEBUG && is_wp_error( $message ) ) {
+          wp_die( '<h1>Debug Log</h1><pre>' . print_r( $message, true ) . '</pre>' );
         }
 
         return $data;
