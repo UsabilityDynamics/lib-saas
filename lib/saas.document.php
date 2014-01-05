@@ -243,8 +243,14 @@ namespace UsabilityDynamics {
       /**
        * Updates system log.
        *
+       *
+       * @param string $message
+       * @param bool   $args
+       *
        * @since 1.0.0
        * @author potanin@UD
+       *
+       * @return bool|string
        */
       static function log( $message = '', $args = false ) {
 
@@ -252,7 +258,7 @@ namespace UsabilityDynamics {
           wp_die( '<h1>Debug Log</h1><pre>' . print_r( $message, true ) . '</pre>' );
         }
 
-        return $data;
+        return $message;
 
       }
 
