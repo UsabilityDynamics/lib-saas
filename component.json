@@ -10,11 +10,11 @@
     "usabilitydynamics/lib-utility": "*"
   },
   "schemas": [
-    "schemas/saas.json",
-    "schemas/saas.document.json"
+    "static/schemas/saas.json",
+    "static/schemas/saas.document.json"
   ],
   "files": [
-    "files/saas.config.json"
+    "static/files/saas.config.json"
   ],
   "lib": [
     "lib/saas.php",
@@ -23,9 +23,9 @@
     "lib/raas.job.php"
   ],
   "scripts": [
-    "scripts/saas.js",
-    "scripts/saas.document.js",
-    "scripts/model.js",
-    "scripts/socket.js"
+    "static/scripts/saas.js",
+    "static/scripts/saas.document.js",
+    "static/scripts/model.js",
+    "static/scripts/socket.js"
   ]
 }

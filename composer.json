@@ -3,8 +3,7 @@
   "keywords": [ "api", "raas", "saas" ],
   "type": "library",
   "require": {
-    "usabilitydynamics/lib-utility": "*",
-    "usabilitydynamics/wp-xmlrpc": "*"
+    "usabilitydynamics/lib-utility": "*"
   },
   "minimum-stability": "dev",
   "repositories": [
@@ -14,12 +13,7 @@
     }
   ],
   "autoload": {
-    "classmap": [
-      "lib/saas.php",
-      "lib/saas.document.php",
-      "lib/raas.php",
-      "lib/raas.job.php"
-    ]
+    "classmap": [ "lib" ]
   },
   "homepage": "http://github.com/usabilitydynamics/lib-saas",
   "authors": [
