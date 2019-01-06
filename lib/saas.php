@@ -34,7 +34,7 @@ namespace UsabilityDynamics {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.1.2';
+      public static $version = '0.2.0';
 
       /**
        * Returns one of several keys. Different keys are used for different things.
